@@ -15,14 +15,12 @@ off, and the delivery note says exactly what was verified and what wasn't.
 
 ## Try it
 
-| English | فارسی |
-|---|---|
-| *"Make a 15s promo for my app launch"* | *«یه موشن گرافیک باحال برام بساز»* |
-| *"Intro/outro for my YouTube channel"* | *«اینترو و تیزر برام بساز»* |
-| *"This render looks generic — fix the motion"* | *«این ویدیو رو حرفه‌ای‌تر کن»* |
+- *"Make a 15s promo for my app launch"*
+- *"Intro/outro for my YouTube channel"*
+- *"This render looks generic — fix the motion"*
 
 On a desktop harness you get a rendered `.mp4`. On mobile / chat-only apps
-MotionCraft can't render — it says so and delivers the **mobile kit** instead:
+MotionCraft cannot render — it says so and delivers the **mobile kit** instead:
 scene table, the complete project as text, exact commands, and a checklist to
 run on any desktop.
 
@@ -36,14 +34,115 @@ run on any desktop.
    scene; deterministic music/SFX kits; audio score declared as data.
 5. **Render & verify** — machine checks (`scripts/verify-render.mjs`: silence,
    loudness, brand colors, no system fonts), then a visual pass by someone with
-   eyes; ≤ 3 fix loops.
-6. **Deliver** — honest note: what was machine-checked, what was seen, what
-   remains `UNVERIFIED-VISUALLY` if you couldn't see it.
+   eyes; at most 3 fix loops.
+6. **Deliver** — an honest note: what was machine-checked, what was seen, and
+   what remains `UNVERIFIED-VISUALLY` if you could not see it.
 
 Principles P1–P10 live in `SKILL.md`; palettes/type/rhythm/sound detail in
 `references/design-rules.md`; copy-paste scene recipes (byte-identical to code
 that compiled and rendered in a conformance project) in
 `references/motion-patterns.md`.
+
+---
+
+## Install & setup
+
+A skill is just a folder containing `SKILL.md` — installing MotionCraft means
+putting that folder where your agent looks for skills. Rendering additionally
+needs a desktop with Node and a browser (see Requirements below).
+
+### 1) One-command install (any agent that supports the `skills` CLI)
+
+```bash
+npx skills add <your-github>/motioncraft --agent claude-code
+# other agents: --agent cursor, --agent codex, --agent gemini, ...
+```
+
+### 2) Manual — Claude Code (recommended default)
+
+Personal scope (every project on this machine):
+
+```bash
+# macOS / Linux
+mkdir -p ~/.claude/skills
+git clone https://github.com/<your-github>/motioncraft ~/.claude/skills/motioncraft
+# …or copy the folder instead:
+# cp -r motioncraft ~/.claude/skills/
+```
+
+```powershell
+# Windows (PowerShell)
+mkdir -p $HOME\.claude\skills
+git clone https://github.com/<your-github>/motioncraft $HOME\.claude\skills\motioncraft
+```
+
+Project scope (only this repo uses it): put the folder at
+`.claude/skills/motioncraft/` inside the project and commit it.
+
+### 3) Manual — other agents (same rule, different folder)
+
+Skills are the same open format everywhere; only the location changes.
+
+| Agent | Global folder | Project folder |
+|---|---|---|
+| Claude Code | `~/.claude/skills/` | `.claude/skills/` |
+| Cursor | `~/.cursor/skills/` | `.cursor/skills/` |
+| Windsurf | `~/.windsurf/skills/` | `.windsurf/skills/` |
+| Codex | `~/.agents/skills/` | `.agents/skills/` |
+| Cline | `~/.cline/skills/` | `.cline/skills/` |
+| Roo Code | `~/.roo-code/skills/` | `.roo-code/skills/` |
+| Gemini CLI | `~/.gemini/skills/` | `.gemini/skills/` |
+| GitHub Copilot | — | `.github/copilot/skills/` |
+
+Clone or copy the `motioncraft` folder into the global or project folder of your
+agent. When in doubt, use the global folder.
+
+### 4) Install from the `.skill` zip
+
+```bash
+unzip motioncraft.skill -d ~/.claude/skills/
+```
+
+The zip unpacks to `~/.claude/skills/motioncraft/SKILL.md`. If your app accepts
+`.skill` uploads directly (claude.ai — see below), skip the terminal entirely.
+
+### 5) claude.ai and mobile apps (no terminal)
+
+1. On **claude.ai** (desktop browser or app): open **Settings → Capabilities**
+   and enable *Code execution and file creation*, then **Customize → Skills**
+   and toggle **MotionCraft** on. Upload `motioncraft.skill` if your plan offers it.
+2. On the **iOS/Android app**: skills you enable on claude.ai sync to the app
+   (uploading files from the phone app itself may be unavailable — do step 1 on
+   a desktop browser once).
+3. **Chat-only surfaces / phones without a skill system:** no install needed —
+   MotionCraft is just text. Ask for a video anyway: it scopes the idea, writes
+   the complete project as ready-to-copy text, and gives you the exact commands
+   to render on any desktop (mobile kit). The render itself needs a desktop.
+
+### Verify the install
+
+On a desktop harness, start a new session and ask: *"Make a 10s logo intro for
+my channel"* — you should get a scoped plan, then a rendered `.mp4`.
+
+### Updating
+
+```bash
+git -C ~/.claude/skills/motioncraft pull        # git install
+npx skills update motioncraft --agent claude-code   # CLI install
+```
+
+### Troubleshooting
+
+- **Skill not listed** → restart the session; the folder must be named exactly
+  `motioncraft` with `SKILL.md` directly inside it (not nested one level deeper).
+- **Zip did nothing** → it must unpack to `<skills-dir>/motioncraft/SKILL.md`.
+  If your tool flattened the folder, re-unzip into a `motioncraft/` folder.
+- **Render fails to start** → run `npx remotion browser ensure`, then retry; on
+  bare Linux also install the Chromium system libs listed in `SKILL.md` §2.
+- **Phone app says it cannot render** → that is expected; ask for the mobile kit
+  and run the commands it returns on any desktop machine.
+
+---
 
 ## Requirements
 
@@ -55,31 +154,13 @@ that compiled and rendered in a conformance project) in
 | Image reading | final visual sign-off | machine checks, then `UNVERIFIED-VISUALLY` + ask |
 | Network | Google Fonts at render time | self-host fonts into `public/fonts/` |
 
-## Install
-
-**Claude Code (per-user):**
-```bash
-git clone https://github.com/<you>/motioncraft ~/.claude/skills/motioncraft
-# or copy the folder:
-# cp -r motioncraft ~/.claude/skills/
-```
-
-**Claude Code (per-project):** put it in `.claude/skills/motioncraft/`.
-
-**Any shell-capable agent:** copy the folder into that agent's skills directory —
-`SKILL.md` is the open agent-skills format.
-
-**Mobile / chat-only:** install may be impossible — use the mobile kit flow by
-asking for a video anyway; MotionCraft will scope, write the whole project as
-text, and hand you desktop commands.
-
-## Repository layout (upload these)
+## Repository layout
 
 ```
 motioncraft/                  ← repo root (clone into ~/.claude/skills/motioncraft)
 ├── SKILL.md                  ← the skill contract (frontmatter name: motioncraft)
 ├── README.md                 ← this file
-├── LICENSE                   ← MIT (adjust the holder line)
+├── LICENSE                   ← MIT open-source license (put your name on the copyright line)
 ├── assets/
 │   └── theme.ts              ← theme template (colors, fonts, easing, springs, fr())
 ├── references/
@@ -96,4 +177,4 @@ motioncraft/                  ← repo root (clone into ~/.claude/skills/motionc
 
 ## License
 
-MIT — see `LICENSE`. Rendered videos are yours.
+MIT — see `LICENSE`.
