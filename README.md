@@ -54,7 +54,7 @@ needs a desktop with Node and a browser (see Requirements below).
 ### 1) One-command install (any agent that supports the `skills` CLI)
 
 ```bash
-npx skills add <your-github>/motioncraft --agent claude-code
+npx skills add Skill-center/motioncraft --agent claude-code
 # other agents: --agent cursor, --agent codex, --agent gemini, ...
 ```
 
@@ -65,7 +65,7 @@ Personal scope (every project on this machine):
 ```bash
 # macOS / Linux
 mkdir -p ~/.claude/skills
-git clone https://github.com/<your-github>/motioncraft ~/.claude/skills/motioncraft
+git clone https://github.com/Skill-center/motioncraft ~/.claude/skills/motioncraft
 # …or copy the folder instead:
 # cp -r motioncraft ~/.claude/skills/
 ```
@@ -73,7 +73,7 @@ git clone https://github.com/<your-github>/motioncraft ~/.claude/skills/motioncr
 ```powershell
 # Windows (PowerShell)
 mkdir -p $HOME\.claude\skills
-git clone https://github.com/<your-github>/motioncraft $HOME\.claude\skills\motioncraft
+git clone https://github.com/Skill-center/motioncraft $HOME\.claude\skills\motioncraft
 ```
 
 Project scope (only this repo uses it): put the folder at
